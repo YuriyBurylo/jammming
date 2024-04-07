@@ -1,5 +1,9 @@
 import logo from './logo.svg';
 import './App.css';
+import SearchBar from './SearchBar/SearchBar';
+import SearchResults from './SearchResults/SearchResults';
+import PlayList from './PlayList/PlayList'; 
+import TrackList from './TrackList/TrackList';
 
 function App() {
   return (
@@ -18,6 +22,15 @@ function App() {
           Learn React
         </a>
       </header>
+      <main>
+        <SearchBar>
+          <TrackList />
+        </SearchBar>
+        <SearchResults />
+        <PlayList>
+          <TrackList />
+        </PlayList>
+      </main>
     </div>
   );
 }
