@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import SearchBar from './SearchBar/SearchBar';
@@ -6,6 +7,10 @@ import PlayList from './PlayList/PlayList';
 import TrackList from './TrackList/TrackList';
 
 function App() {
+  const [input, setInput] = useState([]);
+  const handleInput = (event) => {
+    setInput(event.target.value);
+  };
   return (
     <div className="App">
       <header className="App-header">
@@ -23,10 +28,10 @@ function App() {
         </a>
       </header>
       <main>
-        <SearchBar>
+        <SearchBar handleInput={handleInput} value={input}/>
+        <SearchResults>
           <TrackList />
-        </SearchBar>
-        <SearchResults />
+        </SearchResults>
         <PlayList>
           <TrackList />
         </PlayList>
