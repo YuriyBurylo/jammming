@@ -7,7 +7,7 @@ import PlayList from './PlayList/PlayList';
 import TrackList from './TrackList/TrackList';
 
 function App() {
-  const [input, setInput] = useState([]);
+  const [input, setInput] = useState("");
   const handleInput = (event) => {
     setInput(event.target.value);
   };
@@ -15,21 +15,10 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
       <main>
         <SearchBar handleInput={handleInput} value={input}/>
-        <SearchResults>
+        <SearchResults data={input}>
           <TrackList />
         </SearchResults>
         <PlayList>
