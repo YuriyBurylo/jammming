@@ -1,6 +1,11 @@
 import React from 'react';
+import TrackList from '../TrackList/TrackList';
 function SearchResults(props) {
-    console.log(props.data);
-    return <div>{props.data}</div>;
+    return (
+        <div>
+            <h2>Results</h2>
+            <TrackList list={props.data} button="+" handleClick={props.addToPlayList}/>
+        </div>
+    );
 }
 export default SearchResults;  
