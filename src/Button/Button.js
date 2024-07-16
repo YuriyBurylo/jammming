@@ -1,8 +1,8 @@
 import React from 'react';
 
-function Button(props) {
+function Button({identifier, handleClick, children}) {
 
-    return <button value={props.identifier} onClick={props.handleClick}>{props.sign}</button>;
+    return <button value={identifier} onClick={handleClick}>{children}</button>;
 }
 
 export default Button;

@@ -7,7 +7,7 @@ function TrackList(props) {
     return (
         <ol>
             {
-                tracksArray.map((track, index) => <li key={index}><Track object={track} /><Button identifier={track.id} sign={props.button} handleClick={props.handleClick} /></li>)
+                tracksArray.map((track, index) => <li key={index}><Track object={track} /><Button identifier={track.id} handleClick={props.handleClick}>{props.button}</Button></li>)
             }
         </ol>
     );

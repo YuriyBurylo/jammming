@@ -1,12 +1,12 @@
 import React from 'react';
 import styles from './Track.module.css';
 
-function Track(props) {
+function Track({object}) {
     return (
         <article className={styles.trackbox}>
-            <div className={styles.name}>{props.object.name}</div>
-            <div className={styles.artist}>{props.object.artist}</div>
-            <div className={styles.album}>album: {props.object.album}</div>
+            <div className={styles.name}>{object.name}</div>
+            <div className={styles.artist}>{object.artist}</div>
+            <div className={styles.album}>album: {object.album}</div>
         </article>
     );
 }
