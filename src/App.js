@@ -128,7 +128,7 @@ function App() {
         <SearchBar handleInput={handleInput} value={input}/>
         <SearchResults data={results} addToPlayList={addToPlayListFunc} />
         <PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} changeHandler={handleChange} clickHandler={handleClick} plInput={playlistTitle}/>
-        <MyPlayLists data={playListArray} changePlayListTitle={changePlayListTitle} value={newPlayListTitle} rename={renamePlayList} delete={deletePlayList}/>
+        <MyPlayLists data={playListArray} changePlayListTitle={changePlayListTitle} value={newPlayListTitle} rename={renamePlayList} del={deletePlayList}/>
       </main>
       <footer>
       </footer>

@@ -2,10 +2,10 @@ import React from 'react';
 import Button from '../Button/Button';
 import styles from './MyPlayLists.module.css';
 
-function MyPlayLists(props) {
+function MyPlayLists({ data, changePlayListTitle, value, rename, del }) {
     return (
         <ul>
-            {props.data.map((playlist, index) => <li key={index}><form><input onChange={props.changePlayListTitle} value={props.value || playlist[0]}/><Button identifier={index}  handleClick={props.rename} sign="RENAME"/><Button identifier={index} handleClick={props.delete} sign="DELETE"/></form></li>)}
+            {data.map((playlist, index) => <li key={index}><form><input onChange={changePlayListTitle} value={value || playlist[0]}/><Button identifier={index}  handleClick={rename}>RENAME</Button><Button identifier={index} handleClick={del}>DELETE</Button></form></li>)}
         </ul>
     )
 }
