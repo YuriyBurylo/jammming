@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+input {
+  margin: 10px 10px;
+}
+
+input:focus {
+  background-color: #61dafb;
+}

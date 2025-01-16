@@ -4,7 +4,7 @@ import SearchBar from './SearchBar/SearchBar';
 import SearchResults from './SearchResults/SearchResults';
 import PlayList from './PlayList/PlayList'; 
 import MyPlayLists from './MyPlayLists/MyPlayLists';
-// import requestAccessToken from './AccessTokenRequest';
+import requestAccessToken from './AccessTokenRequest';
 
 
 const mockArray = [
@@ -39,7 +39,7 @@ function App() {
   const [playlistTitle, setPlaylistTitle] = useState("Enter playlist title");
   const [newPlaylist, setNewPlaylist] = useState([]);
   const [playListArray, setPlayListArray] = useState([]);
-  const [newPlayListTitle, setNewPlayListTitle] = useState("");
+ 
   
 
   const makeUrl = () => {
@@ -59,13 +59,11 @@ function App() {
   useEffect(() => {
     const hash = window.location.hash;
     let token = localStorage.getItem('token');
-    console.log(token);
     if(!token && hash) {
       token = hash.substring(1).split('&').find(elem => elem.startsWith('access_token')).split('=')[1];
       localStorage.setItem('token', token);
       setAccessToken(token);
     };
-    console.log(accessToken);
   });
 
   const handleInput = (event) => {
@@ -100,22 +98,8 @@ function App() {
     console.log("Saved");
   };
 
-  const changePlayListTitle = (event) => {
-    setNewPlayListTitle(event.target.value);
-  };
-
-  const renamePlayList = (event) => {
-       const playlistIndex = event.target.value;
-       const newPlayListArray = [...playListArray];
-       newPlayListArray[playlistIndex][0] = newPlayListTitle;
-       setPlayListArray(newPlayListArray);
-  };
-
-  const deletePlayList = (event) => {
-      const playListIndex = event.target.value;
-      const newPlayListArray = [...playListArray];
-      newPlayListArray.splice(playListIndex, 1);
-      setPlayListArray(newPlayListArray);
+  const changePlayListArray = (newPlayListArray) => {
+    setPlayListArray(newPlayListArray);
   };
 
   return (
@@ -128,7 +112,7 @@ function App() {
         <SearchBar handleInput={handleInput} value={input}/>
         <SearchResults data={results} addToPlayList={addToPlayListFunc} />
         <PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} changeHandler={handleChange} clickHandler={handleClick} plInput={playlistTitle}/>
-        <MyPlayLists data={playListArray} changePlayListTitle={changePlayListTitle} value={newPlayListTitle} rename={renamePlayList} del={deletePlayList}/>
+        <MyPlayLists data={playListArray} changeHandler={changePlayListArray}/>
       </main>
       <footer>
       </footer>

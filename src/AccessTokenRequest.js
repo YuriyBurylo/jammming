@@ -27,4 +27,4 @@ function requestAccessToken () {
     }).catch(error => console.log(error));
 }
 
-// export default requestAccessToken; 
+export default requestAccessToken; 
