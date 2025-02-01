@@ -4,37 +4,12 @@ import SearchBar from './SearchBar/SearchBar';
 import SearchResults from './SearchResults/SearchResults';
 import PlayList from './PlayList/PlayList'; 
 import MyPlayLists from './MyPlayLists/MyPlayLists';
-import requestAccessToken from './AccessTokenRequest';
 
-
-const mockArray = [
-  {
-    id: 1,
-    name: "Bohemian Rapsody",
-    artist: "Freddy",
-    album: "It'a miracle", 
-    uri: "https://open.spotify.com/track/3z8h0TU7ReDPLIbEnYhWZb"
-  },
-  {
-    id: 2,
-    name: "I'll always love you",
-    artist: "Witney Hewston",
-    album: "My darling you",
-    uri: "https://open.spotify.com/track/4eHbdreAnSOrDDsFfc4Fpm"
-  },
-  {
-    id: 3,
-    name: "It must have been love",
-    artist: "Roxette",
-    album: "The best of Roxette",
-    uri: "https://open.spotify.com/track/6kvoHl80mfCVTv7XnZkjQn"
-  }
-];
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
   const [input, setInput] = useState("");
-  const [results, setResults] = useState(mockArray);
+  const [results, setResults] = useState([]);
   const [selected, setSelected] = useState([]);
   const [playlistTitle, setPlaylistTitle] = useState("Enter playlist title");
   const [newPlaylist, setNewPlaylist] = useState([]);
@@ -43,7 +18,7 @@ function App() {
   
 
   const makeUrl = () => {
-      const client_id = 'b950eca9da224897ab584ad2416b3172';
+      const client_id = '526c2e259cad436489e35e5edd73fa59';
       const redirect_uri = 'http://localhost:3000';
       const scope = 'user-read-private user-read-email';
   
@@ -58,17 +33,78 @@ function App() {
 
   useEffect(() => {
     const hash = window.location.hash;
+    console.log("HASH : ", hash);
     let token = localStorage.getItem('token');
-    if(!token && hash) {
-      token = hash.substring(1).split('&').find(elem => elem.startsWith('access_token')).split('=')[1];
-      localStorage.setItem('token', token);
-      setAccessToken(token);
+    console.log("Token from LocalStorage : ", token);
+
+    let newToken = hash ? hash.substring(1).split('&').find(elem => elem.startsWith('access_token')).split('=')[1]: undefined;
+    let expiration = hash ? hash.substring(1).split('&').find(elem => elem.startsWith('expires_in')).split('=')[1]: undefined;
+    console.log('Expires in: ', expiration);
+    if (newToken !== undefined) {
+      let tokenTime = Date.now();
+      console.log("TokenDate: ", tokenTime);
+      const d = new Date(tokenTime);
+      console.log(d);
+      let tokenExpirationTime = Date.now() + expiration * 1000;
+      localStorage.setItem('tokenExpirationTime', tokenExpirationTime);
+      console.log("TokenExpirationTime", tokenExpirationTime);
+      const d1 = new Date(tokenExpirationTime);
+      console.log(d1);
     };
+
+    if (!token && newToken) {
+      localStorage.setItem('token', newToken);
+    };
+    if (token !== newToken && newToken !== undefined) {
+      localStorage.removeItem('token');
+      localStorage.setItem('token', newToken);
+    };
+    setAccessToken(localStorage.getItem('token'));
+    console.log("Access Token : ", accessToken);
   });
+  
+  setInterval(() => {
+    let currentTime = Date.now();
+    let tokenExpirationTime = localStorage.getItem('tokenExpirationTime');
+    if(currentTime > tokenExpirationTime) {
+      console.log("Your Access Token has expired ! Please, click on the Button 'CONNECT TO SPOTIFY' to restore connection !");
+      localStorage.removeItem('token');
+      localStorage.removeItem('tokenExpirationTime');
+    };
+  }, 10000);
+
 
   const handleInput = (event) => {
     setInput(event.target.value);
+    console.log(input);
   };
+  function makeRequestUrl() {
+    const endpoint = 'https://api.spotify.com/v1/search?';
+    let url = endpoint;
+    url += `q=${input}`;
+    url += '&type=track';
+    return url;
+  }
+  async function makeRequest() {
+    const url = makeRequestUrl();
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+        }
+      });
+      if(!response.ok) {
+        throw new Error(`Response status : ${response.status}`);
+      };
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+      console.log(data.tracks.items);
+      setResults(data.tracks.items);
+    } catch (error) {
+      console.log(error.message);
+    };
+  }
   
   function addToPlayListFunc(event) {
     const trackId = event.target.value;
@@ -109,7 +145,7 @@ function App() {
       </header>
       <main>
         <a href={makeUrl()}>CONNECT TO SPOTIFY</a>
-        <SearchBar handleInput={handleInput} value={input}/>
+        <SearchBar handleInput={handleInput} value={input} makeRequest={makeRequest}/>
         <SearchResults data={results} addToPlayList={addToPlayListFunc} />
         <PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} changeHandler={handleChange} clickHandler={handleClick} plInput={playlistTitle}/>
         <MyPlayLists data={playListArray} changeHandler={changePlayListArray}/>
