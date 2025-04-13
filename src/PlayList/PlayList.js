@@ -7,9 +7,10 @@ function PlayList(props) {
             <form>
                 <label htmlFor="title">Playlist Title : </label>
                 <input id="title" type="text" onChange={props.changeHandler} value={props.plInput}/>
-                <button type="submit" onClick={props.clickHandler}>SAVE PLAYLIST</button>
+                <button type="submit" onClick={props.clickHandler}>SAVE HERE</button>
+                <button type="submit" onClick={props.clickSaveSpotify}>SAVE TO SPOTIFY</button>
             </form>
-            <TrackList list={props.data} button="-" handleClick={props.removeFromPlayList}/>
+            <TrackList list={props.data} button="-" handleClick={props.removeFromPlayList} playHandle={props.play}/>
         </div>
     );
 }

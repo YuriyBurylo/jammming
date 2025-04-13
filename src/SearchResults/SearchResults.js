@@ -4,7 +4,7 @@ function SearchResults(props) {
     return (
         <div>
             <h2>Results</h2>
-            <TrackList list={props.data} button="+" handleClick={props.addToPlayList}/>
+            <TrackList list={props.data} button="+" handleClick={props.addToPlayList} playHandle={props.play}/>
         </div>
     );
 }
