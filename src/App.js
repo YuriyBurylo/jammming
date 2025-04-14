@@ -14,7 +14,7 @@ function App() {
   const [playlistTitle, setPlaylistTitle] = useState("Enter playlist title");
   const [newPlaylist, setNewPlaylist] = useState([]);
   const [playListArray, setPlayListArray] = useState([]);
-  const [playerURL, setPlayerURL] = useState("https://open.spotify.com/embed/playlist/22Y1dC95lDKN8p0k9JPfd8?utm_source=generator");
+  const [playerURL, setPlayerURL] = useState("https://open.spotify.com/embed/playlist/00ivJpMO25qAD29RuQo8Sk?utm_source=generator");
  
   
 
@@ -79,7 +79,7 @@ function App() {
   function handleInput (event) {
     setInput(event.target.value);
     console.log("My input: ", input);
-  };
+  }
 
   function makeRequestUrl() {
     const endpoint = 'https://api.spotify.com/v1/search?';
@@ -117,26 +117,26 @@ function App() {
       if(!selected.includes(newTrack)) {
         setSelected(prev => [...prev, newTrack]);
       };
-  };
+  }
 
   function removeFromPlayListFunc (event) {
     const trackId = event.target.value;
     const newSelected = selected.filter(track => track.id != trackId);
     setSelected(newSelected);
-  };
+  }
 
   function handleChange (event) {
     let title = event.target.value;
     setPlaylistTitle(title);
     const newArray = [title, ...selected];
     setNewPlaylist(newArray);
-  };
+  }
 
   function handleClick (event) {
     event.preventDefault();
     setPlayListArray(prev => [newPlaylist, ...prev]);
     console.log("Saved");
-  };
+  }
 
   async function getUserProfile() {
     const url = 'https://api.spotify.com/v1/me';
@@ -203,6 +203,30 @@ function App() {
     };
   }
 
+  async function getUserPlayList(playlist_id) {
+    const url = `https://api.spotify.com/v1/playlists/${playlist_id}`;
+    try{
+      const response = await fetch(url, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,   
+        }
+      });
+      if(!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      };
+      const userPlayList = await response.json();
+      return userPlayList;
+    } catch(error) {
+      console.log(error.message);
+    };
+  }
+
+  function addPlayListToLocalStorage (userPlayList) {
+    const playListTitle = userPlayList.name;
+    localStorage.setItem(playListTitle, JSON.stringify(userPlayList));
+    console.log('Playlist added to LocalStorage');
+  }
+
   async function clickSaveSpotify() {
     const uris = selected.map(item => item.uri);
     console.log(uris);
@@ -216,6 +240,9 @@ function App() {
     console.log(playlist_id);
     const tracksData = await addTracksToPlayList(playlist_id, uris);
     console.log(tracksData);
+    const userPlayList = await getUserPlayList(playlist_id);
+    console.log(userPlayList);
+    addPlayListToLocalStorage (userPlayList);
   }
 
   function changePlayListArray (newPlayListArray) {
@@ -238,10 +265,10 @@ function App() {
       <main>
         <a href={makeUrl()}>CONNECT TO SPOTIFY</a>
         <iframe title="spotify-iframe" style={{borderRadius: "1rem"}} src={playerURL} width="100%" height="352" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-        <SearchBar handleInput={handleInput} value={input} makeRequest={makeRequest} />
+        <SearchBar handleInput={handleInput} value={input} makeRequest={makeRequest}/>
         <SearchResults data={results} addToPlayList={addToPlayListFunc} play={updateTrackURL}/>
         <PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} play={updateTrackURL} changeHandler={handleChange} clickHandler={handleClick} plInput={playlistTitle} clickSaveSpotify={clickSaveSpotify} />
-        <MyPlayLists data={playListArray} changeHandler={changePlayListArray} />
+        <MyPlayLists data={playListArray} changeHandler={changePlayListArray}/>
       </main>
       <footer>Copyright</footer>
     </div>
