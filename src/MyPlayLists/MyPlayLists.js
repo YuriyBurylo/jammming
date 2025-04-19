@@ -1,54 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 import Button from "../Button/Button";
 import styles from "./MyPlayLists.module.css";
 
-function MyPlayLists({ data, changeHandler }) {
-  const [newPlayListTitle, setNewPlayListTitle] = useState("");
-  const changePlayListTitle = (event) => {
-    setNewPlayListTitle(event.target.value);
-  };
-
-  const renamePlayList = (event) => {
-    const playListIndex = event.target.value;
-    console.log("Index:", playListIndex);
-    const newPlayListArray = [...data];
-    console.log('DATA:', newPlayListArray);
-    const playlist = data[playListIndex];
-    console.log("playlist:", playlist);
-    playlist[0] = newPlayListTitle;
-    console.log(playlist);
-    newPlayListArray.splice(playListIndex, 1, playlist);
-    console.log(newPlayListArray)
-    changeHandler(newPlayListArray);
-    event.preventDefault();
-  };
-
-  const deletePlayList = (event) => {
-    const playListIndex = event.target.value;
-    console.log("EventTarget", playListIndex);
-    const newPlayListArray = [...data];
-    newPlayListArray.splice(playListIndex, 1);
-    changeHandler(newPlayListArray);
-    console.log("newArr", newPlayListArray);
-    event.preventDefault();
-  };
+function MyPlayLists({ data, changePlaylistTitle, rename, play, downloadMyPlaylists }) {
 
   return (
-    <ul>
-      {data.map((playlist, index) => (
-        <li key={index}>
-          <form>
-            <input onChange={changePlayListTitle} placeholder={playlist[0]} />
-            <Button identifier={index} handleClick={renamePlayList}>
-              RENAME
-            </Button>
-            <Button identifier={index} handleClick={deletePlayList}>
-              DELETE
-            </Button>
-          </form>
-        </li>
-      ))}
-    </ul>
+    <div>
+      <h2>My playlists at Spotify</h2>
+      <Button handleClick={downloadMyPlaylists}>Download</Button>
+      <ul style={{listStyle: 'none'}}>
+        {data? data.map((playlist, index) => (
+          <li key={index}>
+            <form>
+              <img src={playlist.images[0].url} height="100px" width="100px" alt="playlist cover image" />
+              <input onChange={changePlaylistTitle} placeholder={playlist.name} />
+              <div>{playlist.tracks.total} tracks</div>
+              <Button identifier={playlist.id} handleClick={rename}>
+                RENAME
+              </Button>
+              <Button identifier={playlist.id} handleClick={play}>
+                PLAY
+              </Button>
+            </form>
+          </li>
+        )):"No playlists found"}
+      </ul>
+    </div>
   );
 }
 

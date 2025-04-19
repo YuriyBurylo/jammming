@@ -12,17 +12,16 @@ function App() {
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState([]);
   const [playlistTitle, setPlaylistTitle] = useState("Enter playlist title");
-  const [newPlaylist, setNewPlaylist] = useState([]);
-  const [playListArray, setPlayListArray] = useState([]);
-  const [playerURL, setPlayerURL] = useState("https://open.spotify.com/embed/playlist/00ivJpMO25qAD29RuQo8Sk?utm_source=generator");
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [playListsObject, setPlayListsObject] = useState({});
+  const [playerURL, setPlayerURL] = useState("https://open.spotify.com/embed/playlist/12MvLfhv27KNq5dCF0ifDE?utm_source=generator");
  
   
 
   const makeUrl = () => {
       const client_id = '526c2e259cad436489e35e5edd73fa59';
       const redirect_uri = 'http://localhost:3000';
-      const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private';
-  
+      const scope = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private';
       let url = 'https://accounts.spotify.com/authorize';
       url += '?response_type=token';
       url += '&client_id=' + client_id;
@@ -64,7 +63,6 @@ function App() {
     console.log("Access Token : ", accessToken);
   });
 
-
   setInterval(() => {
     let currentTime = Date.now();
     let tokenExpirationTime = localStorage.getItem('tokenExpirationTime');
@@ -89,7 +87,8 @@ function App() {
     return url;
   }
   
-  async function makeRequest() {
+  async function makeRequest(event) {
+    event.preventDefault();
     const url = makeRequestUrl();
     console.log("My URL: ", url);
     try {
@@ -113,7 +112,7 @@ function App() {
   
   function addToPlayListFunc(event) {
     const trackId = event.target.value;
-      const newTrack = results.find(result => result.id == trackId);
+      const newTrack = results.find(result => result.id === trackId);
       if(!selected.includes(newTrack)) {
         setSelected(prev => [...prev, newTrack]);
       };
@@ -121,21 +120,13 @@ function App() {
 
   function removeFromPlayListFunc (event) {
     const trackId = event.target.value;
-    const newSelected = selected.filter(track => track.id != trackId);
+    const newSelected = selected.filter(track => track.id !== trackId);
     setSelected(newSelected);
   }
 
   function handleChange (event) {
     let title = event.target.value;
     setPlaylistTitle(title);
-    const newArray = [title, ...selected];
-    setNewPlaylist(newArray);
-  }
-
-  function handleClick (event) {
-    event.preventDefault();
-    setPlayListArray(prev => [newPlaylist, ...prev]);
-    console.log("Saved");
   }
 
   async function getUserProfile() {
@@ -203,8 +194,10 @@ function App() {
     };
   }
 
-  async function getUserPlayList(playlist_id) {
-    const url = `https://api.spotify.com/v1/playlists/${playlist_id}`;
+  async function getUserPlayLists () {   
+    const userProfile = await getUserProfile();
+    const user_id = userProfile.id;
+    const url = `https://api.spotify.com/v1/users/${user_id}/playlists`;
     try{
       const response = await fetch(url, {
         headers: {
@@ -214,20 +207,15 @@ function App() {
       if(!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       };
-      const userPlayList = await response.json();
-      return userPlayList;
+      const userPlayLists = await response.json();
+      return userPlayLists;
     } catch(error) {
       console.log(error.message);
     };
   }
 
-  function addPlayListToLocalStorage (userPlayList) {
-    const playListTitle = userPlayList.name;
-    localStorage.setItem(playListTitle, JSON.stringify(userPlayList));
-    console.log('Playlist added to LocalStorage');
-  }
-
-  async function clickSaveSpotify() {
+  async function clickSaveSpotify(event) {
+    event.preventDefault();
     const uris = selected.map(item => item.uri);
     console.log(uris);
     const userProfile = await getUserProfile();
@@ -240,14 +228,12 @@ function App() {
     console.log(playlist_id);
     const tracksData = await addTracksToPlayList(playlist_id, uris);
     console.log(tracksData);
-    const userPlayList = await getUserPlayList(playlist_id);
-    console.log(userPlayList);
-    addPlayListToLocalStorage (userPlayList);
+    const userPlayLists = await getUserPlayLists();
+    console.log(userPlayLists);
+    setPlayListsObject(userPlayLists);
+    console.log(playListsObject);
+    setSelected([]);
   }
-
-  function changePlayListArray (newPlayListArray) {
-    setPlayListArray(newPlayListArray);
-  };
 
   function updateTrackURL (event) {
     const trackID = event.target.value;
@@ -255,6 +241,59 @@ function App() {
     url += trackID;
     url += "?utm_source=generator";
     setPlayerURL(url);
+    const element = document.getElementById('player');
+    if (element) element.scrollIntoView();
+  }
+
+  async function downloadUserPlaylists(event) {
+    event.preventDefault();
+    const userPlayLists = await getUserPlayLists();
+    console.log(userPlayLists);
+    setPlayListsObject(userPlayLists);
+}
+
+  const changePlaylistTitle = (event) => {
+    setNewPlaylistName(event.target.value);
+  };
+
+  async function changePlaylistName(playlist_id, newPlaylistName) {
+    const url = `https://api.spotify.com/v1/playlists/${playlist_id}`;
+    try {
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+          "Content-Type": "application/json",    
+        },
+        body: JSON.stringify({name: newPlaylistName,}),
+      });
+      if(!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      };
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.log(error.message);
+    };
+  }
+
+  async function renamePlaylist (event) {
+    event.preventDefault();
+    const playlist_id= event.target.value;
+    await changePlaylistName(playlist_id, newPlaylistName);
+    const userPlayLists = await getUserPlayLists();
+    setPlayListsObject(userPlayLists);
+  };
+
+  async function updatePlaylistURL (event) {
+    const playlist_id = event.target.value;
+    let url = "https://open.spotify.com/embed/playlist/";
+    url += playlist_id;
+    url += "?utm_source=generator";
+    setPlayerURL(url);
+    const element = document.getElementById('player');
+    if (element) element.scrollIntoView();
+    event.preventDefault();
   }
 
   return (
@@ -262,15 +301,15 @@ function App() {
       <header>
         <h1>JAMMMING</h1>
       </header>
-      <main>
-        <a href={makeUrl()}>CONNECT TO SPOTIFY</a>
-        <iframe title="spotify-iframe" style={{borderRadius: "1rem"}} src={playerURL} width="100%" height="352" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <main> 
+        <a href={makeUrl()}><h2>CONNECT TO SPOTIFY</h2></a>
+        <iframe id="player" title="spotify-iframe" style={{borderRadius: "1rem"}} src={playerURL} width="100%" height="352" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         <SearchBar handleInput={handleInput} value={input} makeRequest={makeRequest}/>
         <SearchResults data={results} addToPlayList={addToPlayListFunc} play={updateTrackURL}/>
-        <PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} play={updateTrackURL} changeHandler={handleChange} clickHandler={handleClick} plInput={playlistTitle} clickSaveSpotify={clickSaveSpotify} />
-        <MyPlayLists data={playListArray} changeHandler={changePlayListArray}/>
+        <PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} play={updateTrackURL} changeHandler={handleChange} plInput={playlistTitle} clickSaveSpotify={clickSaveSpotify} />
+        <MyPlayLists data={playListsObject.items} changePlaylistTitle={changePlaylistTitle} rename={renamePlaylist} play={updatePlaylistURL} downloadMyPlaylists={downloadUserPlaylists}/>
       </main>
-      <footer>Copyright</footer>
+      <footer>Copyright 2025</footer>
     </div>
   );
 }
