@@ -285,6 +285,7 @@ function App() {
     setPlayListsObject(userPlayLists);
   };
 
+
   async function updatePlaylistURL (event) {
     const playlist_id = event.target.value;
     let url = "https://open.spotify.com/embed/playlist/";
@@ -302,14 +303,14 @@ function App() {
         <h1>JAMMMING</h1>
       </header>
       <main> 
-        <a href={makeUrl()}><h2>CONNECT TO SPOTIFY</h2></a>
+        <a href={makeUrl()}>CONNECT TO SPOTIFY</a>
         <iframe id="player" title="spotify-iframe" style={{borderRadius: "1rem"}} src={playerURL} width="100%" height="352" frameBorder="0" allowFullScreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-        <SearchBar handleInput={handleInput} value={input} makeRequest={makeRequest}/>
-        <SearchResults data={results} addToPlayList={addToPlayListFunc} play={updateTrackURL}/>
-        <PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} play={updateTrackURL} changeHandler={handleChange} plInput={playlistTitle} clickSaveSpotify={clickSaveSpotify} />
-        <MyPlayLists data={playListsObject.items} changePlaylistTitle={changePlaylistTitle} rename={renamePlaylist} play={updatePlaylistURL} downloadMyPlaylists={downloadUserPlaylists}/>
+        <div className="search_bar"><SearchBar handleInput={handleInput} value={input} makeRequest={makeRequest}/></div>
+        <div className="search_results"><SearchResults data={results} addToPlayList={addToPlayListFunc} play={updateTrackURL}/></div>
+        <div className="playlist"><PlayList data={selected} removeFromPlayList={removeFromPlayListFunc} play={updateTrackURL} changeHandler={handleChange} plInput={playlistTitle} clickSaveSpotify={clickSaveSpotify} /></div>
+        <div className="my_playlists"><MyPlayLists data={playListsObject.items} changePlaylistTitle={changePlaylistTitle} rename={renamePlaylist} play={updatePlaylistURL} downloadMyPlaylists={downloadUserPlaylists}/></div>
       </main>
-      <footer>Copyright 2025</footer>
+      <footer>Copyright &copy; 2025 Jammming</footer>
     </div>
   );
 }
