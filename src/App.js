@@ -40,7 +40,8 @@ function App() {
     let newToken = hash ? hash.substring(1).split('&').find(elem => elem.startsWith('access_token')).split('=')[1]: undefined;
     let expiration = hash ? hash.substring(1).split('&').find(elem => elem.startsWith('expires_in')).split('=')[1]: undefined;
     console.log('Expires in: ', expiration);
-    if (newToken !== undefined) {
+
+      if (newToken !== undefined) {
       let tokenTime = Date.now();
       console.log("TokenDate: ", tokenTime);
       const d = new Date(tokenTime);
@@ -63,16 +64,16 @@ function App() {
     console.log("Access Token : ", accessToken);
   });
 
-  setInterval(() => {
+setInterval(() => {
     let currentTime = Date.now();
     let tokenExpirationTime = localStorage.getItem('tokenExpirationTime');
-    if(currentTime > tokenExpirationTime) {
-      console.log("Your Access Token has expired ! Please, click on the Button 'CONNECT TO SPOTIFY' to restore connection !");
+    if(currentTime >= tokenExpirationTime) {
       localStorage.removeItem('token');
       localStorage.removeItem('tokenExpirationTime');
-      window.location.href = makeUrl();
+      window.location.reload();
     };
-  }, 1000);
+  }, 2000);
+
 
   function handleInput (event) {
     setInput(event.target.value);
