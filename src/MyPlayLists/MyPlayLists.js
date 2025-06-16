@@ -1,8 +1,9 @@
 import React from "react";
 import Button from "../Button/Button";
 import styles from "./MyPlayLists.module.css";
+import image from "../images/playlist.jpeg";
 
-function MyPlayLists({ data, changePlaylistTitle, rename, show, play, downloadMyPlaylists }) {
+function MyPlayLists({ data, changePlaylistTitle, rename, play, downloadMyPlaylists }) {
 
   return (
     <div>
@@ -14,7 +15,7 @@ function MyPlayLists({ data, changePlaylistTitle, rename, show, play, downloadMy
         {data? data.map((playlist, index) => (
           <li key={index}>
             <form className={styles.container}>
-              <img className={styles.image} src={playlist.images[0].url} height="100px" width="100px" alt="playlist cover" />
+              <img className={styles.image} src={image} height="110px" width="110px" alt="playlist cover" />
               <input className={styles.name} onChange={changePlaylistTitle} placeholder={playlist.name}/>
               <div className={styles.tracks}>{playlist.tracks.total} tracks</div>
               <div className={styles.rename}>

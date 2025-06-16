@@ -15,8 +15,6 @@ function App() {
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [playListsObject, setPlayListsObject] = useState({});
   const [playerURL, setPlayerURL] = useState("https://open.spotify.com/embed/playlist/12MvLfhv27KNq5dCF0ifDE?utm_source=generator");
- 
-  
 
   const makeUrl = () => {
       const client_id = '526c2e259cad436489e35e5edd73fa59';
@@ -29,7 +27,6 @@ function App() {
       url += '&redirect_uri=' + redirect_uri;
       return url;
   };
-
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -67,12 +64,13 @@ function App() {
 setInterval(() => {
     let currentTime = Date.now();
     let tokenExpirationTime = localStorage.getItem('tokenExpirationTime');
-    if(currentTime >= tokenExpirationTime) {
+    if(currentTime > tokenExpirationTime) {
       localStorage.removeItem('token');
       localStorage.removeItem('tokenExpirationTime');
-      window.location.reload();
+      window.location.href = "";
+      window.location.href = makeUrl();
     };
-  }, 2000);
+  }, 1000); 
 
 
   function handleInput (event) {
